@@ -1,4 +1,4 @@
-import * as fs from "fs";
+/*import * as fs from "fs";
 import * as path from "path";
 import CatDetector from "./CatDetector";
 
@@ -41,11 +41,10 @@ try {
 
         testCaseNumber++;
     }
-}  catch (error) {
+} catch (error) {
     if (error instanceof Error) {
         console.error(`Error reading test cases: ${error.message}`);
     } else {
         console.error(`An unexpected error occurred: ${error}`);
     }
-}
-
+}*/

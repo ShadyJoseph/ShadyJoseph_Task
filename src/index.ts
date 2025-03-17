@@ -1,11 +1,57 @@
+import * as fs from "fs";
+import * as path from "path";
 import CatDetector from "./CatDetector";
 
-const detector = new CatDetector(3); // Example: Change state after 3 consecutive frames
+// Load test file
+const filePath = path.join(__dirname, "test_cases", "input.txt");
 
-const frames = [1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0] as (0 | 1)[];
+try {
+    const fileContent = fs.readFileSync(filePath, "utf-8").trim();
+    console.log("\n### Loaded Test Cases from input.txt ###");
+    console.log(fileContent); // Debugging: Verify file content
 
-console.log("Frame Processing:");
-frames.forEach((frame, index) => {
-    const shouldChange = detector.shouldChangeState(frame);
-    console.log(`Frame ${index + 1}: ${frame}, Should Change: ${shouldChange}`);
-});
+    const lines = fileContent.split("\n").map(line => line.trim());
+
+    if (lines.length % 3 !== 0) {
+        throw new Error("Invalid input format in input.txt");
+    }
+
+    let index = 0;
+    let testCaseNumber = 1;
+
+    console.log("\n=== Running Test Cases from input.txt ===");
+
+    while (index < lines.length) {
+        const requiredFrames = parseInt(lines[index++], 10);
+        const frames = lines[index++].split("").map(Number) as (0 | 1)[];
+        const expected = lines[index++].split("").map(Number) as (0 | 1)[];
+
+        if (isNaN(requiredFrames) || requiredFrames <= 0) {
+            console.error(`❌ Test Case ${testCaseNumber}: Invalid requiredFrames value`);
+            continue;
+        }
+
+        const detector = new CatDetector(requiredFrames);
+        const results: (0 | 1)[] = [];
+
+        frames.forEach(frame => {
+            results.push(detector.shouldChangeState(frame));
+        });
+
+        const testPassed = JSON.stringify(results) === JSON.stringify(expected);
+        console.log(`Test Case ${testCaseNumber}: ${testPassed ? "✅ Passed" : "❌ Failed"}`);
+
+        if (!testPassed) {
+            console.log(`Expected: ${expected.join("")}`);
+            console.log(`Received: ${results.join("")}`);
+        }
+
+        testCaseNumber++;
+    }
+} catch (error) {
+    if (error instanceof Error) {
+        console.error(`Error reading test cases: ${error.message}`);
+    } else {
+        console.error(`An unexpected error occurred: ${error}`);
+    }
+}
