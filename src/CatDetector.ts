@@ -1,41 +1,41 @@
 class CatDetector {
-    private requiredFrames: number;
-    private currentState: 0 | 1;
-    private consecutiveCount: number;
-    private lastFrameValue: 0 | 1 | null;
+  private requiredFrames: number;
+  private currentState: number;
+  private count: number;
 
-    constructor(requiredFrames: number) {
-        if (requiredFrames <= 0) {
-            throw new Error("requiredFrames must be a positive integer");
-        }
-        this.requiredFrames = requiredFrames;
-        this.currentState = 0; // Initial state: no cat present (0)
-        this.consecutiveCount = 0;
-        this.lastFrameValue = null; // Track the last frame value
+  constructor(requiredFrames: number) {
+    if (requiredFrames <= 0) {
+      throw new Error("Required frames must be a positive integer.");
+    }
+    this.requiredFrames = requiredFrames;
+    this.currentState = 0; // Initial state: no cat present
+    this.count = 0;
+  }
+
+  shouldChangeState(frame: number): number {
+    if (frame !== 0 && frame !== 1) {
+      throw new Error("Invalid frame input. Only 0 (no cat) or 1 (cat present) allowed.");
     }
 
-    shouldChangeState(frameValue: 0 | 1): 0 | 1 {
-        // If the frame value is the same as the last frame value, increment the counter
-        if (frameValue === this.lastFrameValue) {
-            this.consecutiveCount++;
-        } else {
-            // Reset the counter if the frame value changes
-            this.consecutiveCount = 1;
-            this.lastFrameValue = frameValue;
-        }
-
-        // Check if the consecutive count meets the threshold
-        if (this.consecutiveCount >= this.requiredFrames) {
-            // Change the state if the current frame value is different from the current state
-            if (frameValue !== this.currentState) {
-                this.currentState = frameValue;
-                this.consecutiveCount = 0; // Reset the counter after state change
-                return 1; // State changed
-            }
-        }
-
-        return 0; // State not changed
+    if (frame !== this.currentState) {
+      // Frame is different than current state, so add to our streak.
+      this.count++;
+      if (this.count >= this.requiredFrames) {
+        // Enough consecutive (or near-consecutive, with outliers subtracting one)
+        // frames have been observed so change state.
+        this.currentState = frame;
+        this.count = 0;
+        return 1;
+      }
+    } else {
+      // Frame matches the current state.
+      // Instead of resetting count entirely, decrement it by one if we had any progress.
+      if (this.count > 0) {
+        this.count--;
+      }
     }
+    return 0;
+  }
 }
 
 export default CatDetector;
