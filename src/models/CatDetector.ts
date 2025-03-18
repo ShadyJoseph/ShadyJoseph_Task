@@ -4,7 +4,7 @@ class CatDetector {
   private count: number;
 
   constructor(requiredFrames: number) {
-    if (requiredFrames <= 0) {
+    if (!Number.isInteger(requiredFrames) || requiredFrames <= 0) {
       throw new Error("Required frames must be a positive integer.");
     }
     this.requiredFrames = requiredFrames;
@@ -12,28 +12,26 @@ class CatDetector {
     this.count = 0;
   }
 
+  /**
+   * Processes a frame result (0 or 1) and determines if the state should change.
+   * @param frame - The result from processing the frame (0 or 1)
+   * @returns 1 if the state changed, 0 otherwise.
+   */
   shouldChangeState(frame: number): number {
     if (frame !== 0 && frame !== 1) {
       throw new Error("Invalid frame input. Only 0 (no cat) or 1 (cat present) allowed.");
     }
 
-    if (frame !== this.currentState) {
-      // Frame is different than current state, so add to our streak.
-      this.count++;
-      if (this.count >= this.requiredFrames) {
-        // Enough consecutive (or near-consecutive, with outliers subtracting one)
-        // frames have been observed so change state.
-        this.currentState = frame;
-        this.count = 0;
+    if (frame === this.currentState) {
+      this.count = Math.max(0, this.count - 1); // Reduce streak counter if a mismatch was in progress
+    } else {
+      if (++this.count >= this.requiredFrames) {
+        this.currentState = frame; // Change state
+        this.count = 0; // Reset counter
         return 1;
       }
-    } else {
-      // Frame matches the current state.
-      // Instead of resetting count entirely, decrement it by one if we had any progress.
-      if (this.count > 0) {
-        this.count--;
-      }
     }
+    
     return 0;
   }
 }
