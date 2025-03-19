@@ -1,18 +1,13 @@
 ShadyJoseph_Task
 📁 Folder Structure
 ShadyJoseph_Task/
-│── src/
-│   ├── models/                # Core models
-│   │   ├── catDetector.ts      # Cat detection logic
-│   ├── tests/                 # Test cases and test runner
-│   │   ├── runTests.ts        # Script to run all test cases
-│   │   ├── testCases.txt      # Input test cases (if applicable)
-│   ├── utils/                 # Utility functions
-│   │   ├── fileReader.ts      # Reads input files for test cases
-│              
-│── package.json               # Project dependencies and scripts
-│── tsconfig.json              # TypeScript configuration file
-│── README.md                  # Project documentation
+catDetector.ts (inside src/models/) - Implements the cat detection logic.
+runTests.ts (inside src/tests/) - Runs all test cases.
+testCases.txt (inside src/tests/) - Contains input test cases.
+fileReader.ts (inside src/utils/) - Reads input files for test cases.
+package.json (root) - Defines project dependencies and scripts.
+tsconfig.json (root) - Configures TypeScript settings.
+README.md (root) - Contains project documentation
 
 
 
