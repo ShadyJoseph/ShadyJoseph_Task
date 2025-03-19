@@ -1,28 +1,43 @@
 import CatDetector from '../models/CatDetector';
 import { readTestFile } from '../utils/fileReader';
 
-/**
- * Runs test cases from a specified file.
- * @param filename - Path to the test file
- */
 function runTests(filename: string): void {
-  const data = readTestFile(filename);
+  try {
+    // Read test cases from the given file
+    const data = readTestFile(filename);
+    let passed = 0, failed = 0;
 
-  for (let i = 0; i < data.length; i += 3) {
-    if (i + 2 >= data.length) break;
+    // Process test cases in groups of three lines
+    for (let i = 0; i + 2 < data.length; i += 3) {
+      const testCaseNumber = i / 3 + 1;
 
-    const requiredFrames = parseInt(data[i], 10);
-    const frameSequence = Array.from(data[i + 1], Number);
-    const expectedOutput = Array.from(data[i + 2], Number);
+      // Parse test case data
+      const requiredFrames = parseInt(data[i], 10); // Number of frames required to detect a cat
+      const frameSequence = data[i + 1].split('').map(Number); // Sequence of frames as an array of numbers
+      const expectedOutput = data[i + 2].split('').map(Number); // Expected output sequence
 
-    const detector = new CatDetector(requiredFrames);
-    const actualOutput = frameSequence.map(frame => detector.shouldChangeState(frame));
+      // Initialize CatDetector with required frames
+      const detector = new CatDetector(requiredFrames);
 
-    const passed = actualOutput.join('') === expectedOutput.join('');
-    console.log(`\nTest Case ${Math.floor(i / 3) + 1}: ${passed ? '✅ PASSED' : '❌ FAILED'}`);
-    console.log(`Expected: ${expectedOutput.join('')}`);
-    console.log(`Actual  : ${actualOutput.join('')}`);
-    console.log('-------------------------------------');
+      // Generate actual output by processing each frame
+      const actualOutput = frameSequence.map(frame => detector.shouldChangeState(frame));
+
+      // Compare actual output with expected output
+      const testPassed = JSON.stringify(actualOutput) === JSON.stringify(expectedOutput);
+
+      // Log test results
+      console.log(`\nTest Case ${testCaseNumber}: ${testPassed ? '✅ PASSED' : '❌ FAILED'}`);
+      console.log(`Expected: [${expectedOutput.join(', ')}]`);
+      console.log(`Actual  : [${actualOutput.join(', ')}]`);
+
+      // Update test counters
+      testPassed ? passed++ : failed++;
+    }
+
+    // Print final test summary
+    console.log(`\n✅ Total Passed: ${passed} | ❌ Total Failed: ${failed}`);
+  } catch (error) {
+    console.error(`❌ Error reading file: ${filename}\n`, error);
   }
 }
 
